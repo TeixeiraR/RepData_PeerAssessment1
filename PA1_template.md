@@ -1,16 +1,10 @@
----
-title: "Reproducible Research: Peer Assessment 1"
-output: 
-  html_document:
-    keep_md: true
----
-```{r, echo=FALSE}
-setwd("D:/Meus documentos/Coursera Data Science Specialization/Reproducible Research/RepData_PeerAssessment1")
-```
+# Reproducible Research: Peer Assessment 1
+
 
 ## Loading and preprocessing the data
 
-```{r, results='hide'}
+
+```r
 #upload data and see a litle of it and if all obs are there
 unzip("activity.zip")
 data<-read.csv("activity.csv")
@@ -24,7 +18,7 @@ summary(data)
 
 #remove NA from data
 good<-complete.cases(data)
-table(good) #to see how many NA´s are in data
+table(good) #to see how many NAÂ´s are in data
 #clean data without NA
 cleandata<-data[good,]
 ```
@@ -36,8 +30,25 @@ For this part of the assignment, you can ignore the missing values in the datase
 
 Starting to obtain the total number of steps taken per day and making a histogram of the total number of steps taken each day.
 
-```{r, results='hide'}
+
+```r
 library(dplyr)
+```
+
+```
+## 
+## Attaching package: 'dplyr'
+## 
+## The following object is masked from 'package:stats':
+## 
+##     filter
+## 
+## The following objects are masked from 'package:base':
+## 
+##     intersect, setdiff, setequal, union
+```
+
+```r
 Dados<-tbl_df(cleandata)
 Dados<-select(Dados, steps,date)
 Gdados<-group_by(Dados, date)
@@ -46,13 +57,16 @@ meants<-mean(totsteps$TotalSteps) #for the statistics measures to present later
 medts<-median(totsteps$TotalSteps) #same reason
 ```
 
-```{r, histogram1}
+
+```r
 with(totsteps, hist(TotalSteps,
 main="Histogram of Total Number of Steps per Day", 
 xlab="Number of steps", ylab="Number of Days"))
 ```
 
-The mean and the median of total steps per day is `r meants`and `r medts`, respectivly.
+![](PA1_template_files/figure-html/histogram1-1.png) 
+
+The mean and the median of total steps per day is 1.0766189\times 10^{4}and 10765, respectivly.
 
 
 
@@ -61,7 +75,8 @@ The mean and the median of total steps per day is `r meants`and `r medts`, respe
 
 The time series plot (i.e. type = "l") of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all days (y-axis) is provided bellow.
 
-```{r}
+
+```r
 Dados2<-tbl_df(cleandata)
 Dados2<-select(Dados2, steps,interval)
 Gdados2<-group_by(Dados2,interval)
@@ -71,25 +86,30 @@ with(sub,plot(mean,type="l", main="Average Steps for 5-minutes interval",
 xlab="5 minutes interval", ylab="Average steps"))
 ```
 
+![](PA1_template_files/figure-html/unnamed-chunk-4-1.png) 
+
 Regarding the 5-minute interval, on average across all the days in the dataset, that contains the maximum number of steps:
 
-```{r, results='hide'}
+
+```r
 max<-as.numeric(select(filter(sub, mean==as.numeric(summarize(sub,max=max(mean)))),interval))
 ```
-we obtain `r max`.
+we obtain 835.
 
 
 
 ## Imputing missing values
 
-```{r}
+
+```r
 na<-as.numeric(table(good)[1])
 ```
 
 
-The data has `r na` missing values. The approach used to fill them was using the round mean for that 5-minute interval.
+The data has 2304 missing values. The approach used to fill them was using the round mean for that 5-minute interval.
 
-```{r}
+
+```r
 #get the round mean steps for each 5 min interval
 sub2<-mutate(sub, interval, mean, roundsteps=round(mean,0))
 sub2<-select(sub2,interval,roundsteps)
@@ -106,7 +126,8 @@ newdata<-tbl_df(data)
 
 The histogram of the total number of steps taken each day is provided bellow.
 
-```{r}
+
+```r
 newdata<-select(newdata,steps,date)
 newdata<-group_by(newdata,date)
 newd<-summarize(newdata,totalsteps=sum(steps))
@@ -115,20 +136,20 @@ with(newd,hist(totalsteps, main="Histogram of Total Number of Steps per Day",
 xlab="Number of steps", ylab="Number of Days"))
 ```
 
+![](PA1_template_files/figure-html/unnamed-chunk-8-1.png) 
+
 To obtain the mean and median total number of steps taken per day:
 
-```{r, echo=FALSE}
-a<-with(newd,mean(totalsteps))
-b<-with(newd,median(totalsteps))
-```
-We obtain that the mean and the median are `r a` and `r b`, respectively.
+
+We obtain that the mean and the median are 1.0765639\times 10^{4} and 1.0762\times 10^{4}, respectively.
 
 Comparing the estimates values with the previuos ones, they are similar. In this case and situation, the impact of the used approach was mimimal.
 
 
 ## Are there differences in activity patterns between weekdays and weekends?
 
-```{r}
+
+```r
 ## obtain the weekdays and weekend
 exd<-tbl_df(data)
 ex1<-mutate(exd, days=format(as.Date(date),"%a"))
@@ -136,7 +157,7 @@ ex1<-mutate(exd, days=format(as.Date(date),"%a"))
 #transform the levels of the new factor variable
 ex2<-mutate(ex1, days=gsub("seg","weekday",days),days=gsub("ter","weekday",days),
 days=gsub("qua","weekday",days),days=gsub("qui","weekday",days),
-days=gsub("sex","weekday",days),days=gsub("sáb","weekend",days),
+days=gsub("sex","weekday",days),days=gsub("sÃ¡b","weekend",days),
 days=gsub("dom","weekend",days) )
 
 #obtain the statistics measures
@@ -152,3 +173,5 @@ main=list("Average number of steps for 5-minutes interval by weekdays/weekend",f
 , xlab="Interval",
 ylab="Average Number of steps")
 ```
+
+![](PA1_template_files/figure-html/unnamed-chunk-10-1.png) 
